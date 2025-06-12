@@ -1,0 +1,22 @@
+server:
+  port: 0
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+
+spring:
+  application:
+    name: user-service
+
+  profiles:
+    active: dev # \uD604\uC7AC \uD65C\uC131\uD654\uD560 \uD504\uB85C\uD30C\uC77C
+#    group:
+#      prod: # 'prod' \uD504\uB85C\uD30C\uC77C \uADF8\uB8F9 \uC774\uB984 \uC124\uC815
+#        - "test" # \uD568\uAF10 \uC124\uC815\uD560 \uD504\uB85C\uD30C\uC77C\uB4E4 dev\uD504\uB85C\uD544\uC774 \uD65C\uC131\uD654\uB418\uBA74 test\uB3C4 \uD65C\uC131\uD654\uB310
