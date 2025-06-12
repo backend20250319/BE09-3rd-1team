@@ -13,6 +13,6 @@ public class RoomDTO {
     private String location;            // 위치
     private String roomType;            // 방 타입
     private int pricePerDay;            // 일박 가격
-    
+
     private String sellerId;            // 판매자 정보
 }
