@@ -9,9 +9,10 @@ import lombok.*;
 @ToString
 public class RoomDTO {
     private Long id;                    // 자동생성
-    private String accommodationName;
-    private String location;
-    private String roomType;
-    private int pricePerDay;
-    private String sellerId;
+    private String accommodationName;   // 숙박시설 이름
+    private String location;            // 위치
+    private String roomType;            // 방 타입
+    private int pricePerDay;            // 일박 가격
+    
+    private String sellerId;            // 판매자 정보
 }
