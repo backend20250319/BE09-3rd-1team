@@ -1,0 +1,22 @@
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql.coffit.xyz:3322/unobnb
+    username: unobnb
+    password: unobnb
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  secret: cF9+PeQ8lP+AhXpyWdv9RVwjGw0pnqceYoswB1je3zWSqo98nMvY4IUnqTwKDvGMoHb3VVu1+QipbaYBjcEBsQ==
+  expiration: 1800000
+  refresh-expiration: 604800000
