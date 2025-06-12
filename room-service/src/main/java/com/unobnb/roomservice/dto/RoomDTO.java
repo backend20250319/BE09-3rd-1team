@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class RoomDTO {
-    private Long id;
+    private Long id;                    // 자동생성
     private String accommodationName;
     private String location;
     private String roomType;
