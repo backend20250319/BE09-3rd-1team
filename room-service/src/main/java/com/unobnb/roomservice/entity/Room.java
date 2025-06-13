@@ -30,7 +30,7 @@ public class Room {
     private int pricePerDay;
 
     @Column(name = "seller_id")
-    private String sellerId;
+    private Long sellerId;
 
     public void changePrice(int newPrice) {
         this.pricePerDay = newPrice;

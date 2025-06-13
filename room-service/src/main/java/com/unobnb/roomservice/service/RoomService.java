@@ -1,6 +1,7 @@
 package com.unobnb.roomservice.service;
 
 import com.unobnb.roomservice.dto.RoomDTO;
+import com.unobnb.roomservice.dto.RoomUpdateReqDTO;
 import com.unobnb.roomservice.entity.Room;
 import com.unobnb.roomservice.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,10 +39,23 @@ public class RoomService {
     }
 
     @Transactional
-    public RoomDTO update(RoomDTO roomDTO) {
-        Room room = modelMapper.map(roomDTO, Room.class);
+    public RoomUpdateReqDTO updated(RoomUpdateReqDTO roomUpdateReqDTO) {
+        Room room = roomRepository.findById(roomUpdateReqDTO.getId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 방이 없습니다."));
+
+        room.setAccommodationName(roomUpdateReqDTO.getAccommodationName());
+        room.setLocation(roomUpdateReqDTO.getLocation());
+        room.setRoomType(roomUpdateReqDTO.getRoomType());
+        room.setPricePerDay(roomUpdateReqDTO.getPricePerDay());
+
         Room updated = roomRepository.save(room);
-        return modelMapper.map(updated, RoomDTO.class);
+        return modelMapper.map(updated, RoomUpdateReqDTO.class);
+    }
+
+    public List<RoomDTO> findRoomsByIds(List<Long> ids) {
+        return roomRepository.findAllById(ids).stream()
+                .map(room -> modelMapper.map(room, RoomDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Transactional
