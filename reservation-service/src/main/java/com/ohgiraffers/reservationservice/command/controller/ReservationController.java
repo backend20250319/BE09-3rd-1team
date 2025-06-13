@@ -1,9 +1,6 @@
 package com.ohgiraffers.reservationservice.command.controller;
 
-import com.ohgiraffers.reservationservice.command.dto.ReservationDTO;
-import com.ohgiraffers.reservationservice.command.dto.ReservationDateResponse;
-import com.ohgiraffers.reservationservice.command.dto.ReservationRequest;
-import com.ohgiraffers.reservationservice.command.dto.ReservationResponse;
+import com.ohgiraffers.reservationservice.command.dto.*;
 import com.ohgiraffers.reservationservice.command.service.ReservationService;
 import com.ohgiraffers.reservationservice.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -66,9 +63,15 @@ public class ReservationController {
                 .body(ApiResponse.success(reservationList));
     }
 
-    // 4. 예약 상세 조회(USER)
-    // 필요 정보 : 회원 ID(<- token에서 추출), 예약 ID
-
     // 5. 예약 취소(USER)
-    // 필요 정보 : 회원 ID(<- token에서 추출), 예약 ID
+    // 필요 정보 : 예약 ID
+    @PutMapping("/reservations/{reservation-id}/cancel")
+    public ResponseEntity<ApiResponse<PaymentDTO>> cancelReservation(
+            @PathVariable("reservation-id") Long reservationId) {
+
+        PaymentDTO paymentDTO = reservationService.cancelReservation(reservationId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(paymentDTO));
+    }
 }
