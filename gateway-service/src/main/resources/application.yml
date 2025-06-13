@@ -1,6 +1,8 @@
 server:
   port: 8000
 spring:
+  profiles:
+    active: dev # 현재 활성화할 프로파일
   application:
     name: gateway-server
   cloud:
