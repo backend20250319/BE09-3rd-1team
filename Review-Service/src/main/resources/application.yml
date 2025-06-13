@@ -18,17 +18,3 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html # Swagger UI에 접근할 경로 (기본값)
-    disable-swagger-default-url: true
-    display-request-duration: true # API 호출 시간 표시
-  api-docs:
-    path: /api-docs # OpenAPI 정의 JSON 경로 (기본값 /v3/api-docs)
-  info:
-    title: Review Service API # API 문서 제목
-    version: v1.0.0 # API 버전
-    description: 숙소 리뷰를 관리하는 서비스 API 문서입니다. # API 설명
-    contact:
-      name: Review Team
-      email: contact@example.com
