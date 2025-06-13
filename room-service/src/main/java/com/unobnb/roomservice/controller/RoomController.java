@@ -1,6 +1,8 @@
 package com.unobnb.roomservice.controller;
 
 import com.unobnb.roomservice.dto.RoomDTO;
+import com.unobnb.roomservice.dto.RoomIdListReqDTO;
+import com.unobnb.roomservice.dto.RoomUpdateReqDTO;
 import com.unobnb.roomservice.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,17 +35,23 @@ public class RoomController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RoomDTO> updateRoom(
+    public ResponseEntity<RoomUpdateReqDTO> updateRoom(
             @PathVariable Long id,
-            @RequestBody RoomDTO roomDTO
+            @RequestBody RoomUpdateReqDTO roomUpdateReqDTO
     ) {
-        roomDTO.setId(id);
-        return ResponseEntity.ok(roomService.update(roomDTO));
+        roomUpdateReqDTO.setId(id);
+        return ResponseEntity.ok(roomService.updated(roomUpdateReqDTO));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
         roomService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/list")
+    public ResponseEntity<  List<RoomDTO>> getRoomsByIds(@RequestBody RoomIdListReqDTO request) {
+        List<RoomDTO> rooms = roomService.findRoomsByIds(request.getRoomIdList());
+        return ResponseEntity.ok(rooms);
     }
 }
