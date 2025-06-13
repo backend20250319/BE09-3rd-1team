@@ -1,5 +1,6 @@
 package org.example.reviewservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.reviewservice.dto.ReviewRequest;
 import org.example.reviewservice.dto.ReviewResponse;
@@ -17,13 +18,13 @@ public class ReviewController {
     private final ReviewService service;
 
     @PostMapping
-    public ResponseEntity<ReviewResponse> createReview(@RequestBody ReviewRequest request) {
+    public ResponseEntity<ReviewResponse> createReview(@Valid @RequestBody ReviewRequest request) {
         ReviewResponse response = service.createReview(request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReviewResponse> getReview(@PathVariable Long id) {
+    public ResponseEntity<ReviewResponse> getReview(@Valid @PathVariable Long id) {
         ReviewResponse response = service.getReview(id);
         return ResponseEntity.ok(response);
     }
