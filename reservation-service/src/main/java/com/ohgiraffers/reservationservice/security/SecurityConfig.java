@@ -32,13 +32,16 @@ public class SecurityConfig {
                                 .accessDeniedHandler(restAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth ->
-                        auth
+                                auth
 //                                .requestMatchers(HttpMethod.GET, "/get-test", "/**")
 //                                .permitAll()
-                                .requestMatchers(HttpMethod.GET, "/reservations/reserved-dates").permitAll()
-                                .requestMatchers("/reservations/**").hasAuthority("CUSTOMER")
-                                .anyRequest()
-                                .authenticated()
+                                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/reservations/reserved-dates")
+                                        .permitAll()
+                                        .requestMatchers("/reservations/**")
+                                        .hasAuthority("CUSTOMER")
+                                        .anyRequest()
+                                        .authenticated()
                 )
 
                 // 기존 JWT 검증 필터 대신, Gateway가 전달한 헤더를 이용하는 필터 추가
