@@ -6,7 +6,6 @@ import org.example.reviewservice.dto.ReviewResponse;
 import org.example.reviewservice.entity.ReviewEntity;
 import org.example.reviewservice.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
