@@ -13,7 +13,11 @@ eureka:
 spring:
   application:
     name: reservation-service
-
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql.coffit.xyz:3322/unobnb
+    username: unobnb
+    password: unobnb
   jpa:
     hibernate:
       ddl-auto: create

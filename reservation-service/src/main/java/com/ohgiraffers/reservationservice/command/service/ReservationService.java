@@ -1,10 +1,8 @@
 package com.ohgiraffers.reservationservice.command.service;
 
 import com.ohgiraffers.reservationservice.command.client.PaymentClient;
-import com.ohgiraffers.reservationservice.command.dto.ReservationDTO;
-import com.ohgiraffers.reservationservice.command.dto.ReservationDateResponse;
-import com.ohgiraffers.reservationservice.command.dto.ReservationRequest;
-import com.ohgiraffers.reservationservice.command.dto.ReservationResponse;
+import com.ohgiraffers.reservationservice.command.client.RoomClient;
+import com.ohgiraffers.reservationservice.command.dto.*;
 import com.ohgiraffers.reservationservice.command.entity.Reservation;
 import com.ohgiraffers.reservationservice.command.entity.ReservationStatus;
 import com.ohgiraffers.reservationservice.command.repository.ReservationRepository;
@@ -13,8 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final PaymentClient paymentClient;
+    private final RoomClient roomClient;
 
     public String generateReservationNo(String startDate, String endDate) {
         // 날짜 형식을 yyyyMMdd로 포맷
@@ -39,8 +41,9 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createReservation(ReservationRequest reservationRequest, Long userId) {
 
-        // 1. 결제 요청
-//        Long paymentId = paymentClient.getPaymentId(null);
+        // TODO 실제 요청 필요
+//        PaymentDTO paymentDTO = paymentClient.createPayment(reservationRequest.getAmount()).getData();
+//        Long paymentId = paymentDTO.getPaymentId();
         Long paymentId = 1L;
 
         // 2. 예약 번호 생성
@@ -109,6 +112,72 @@ public class ReservationService {
     public List<ReservationDTO> getReservations(Long userId) {
         List<Reservation> reservations = reservationRepository.findByUserIdOrderByStartDateDesc(userId);
 
-        return null;
+        // 1. 예약 목록에서 roomId들 추출
+        List<Long> roomIds = reservations.stream()
+                .map(Reservation::getRoomId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 2. FeignClient로 room 정보 조회
+        RoomIdListRequest request = RoomIdListRequest.builder()
+                .roomIdList(roomIds)
+                .build();
+
+        // TODO : 실제 요청 필요
+//        List<RoomDTO> rooms = roomClient.getRoomIdList(request)
+//                .getData();
+
+        // TODO : 임시 -> 삭제
+        List<RoomDTO> rooms = roomIds.stream()
+                .map(roomId -> RoomDTO.builder()
+                        .roomId(roomId)
+                        .accommodationName("숙소명_" + roomId) // 테스트용 이름
+                        .location("테스트 지역")
+                        .roomType("스탠다드")
+                        .pricePerDay(100000)
+                        .sellerId(roomId + 100)
+                        .build())
+                .toList();
+
+        // 3. roomId -> RoomDTO 맵핑
+        Map<Long, RoomDTO> roomMap = rooms.stream()
+                .collect(Collectors.toMap(RoomDTO::getRoomId, Function.identity()));
+
+        // 4. Reservation → ReservationDTO로 변환
+        return reservations.stream()
+                .map(reservation -> ReservationDTO.builder()
+                        .reservationId(reservation.getId())
+                        .userId(userId)
+                        .roomId(reservation.getRoomId())
+                        .paymentId(reservation.getPaymentId())
+                        .resvNo(reservation.getResvNo())
+                        .startDate(reservation.getStartDate())
+                        .endDate(reservation.getEndDate())
+                        .status(reservation.getStatus().toString())
+                        .room(roomMap.get(reservation.getRoomId()))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    // 예약 취소
+    public PaymentDTO cancelReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("예약 정보를 찾을 수 없습니다."));
+
+//        // TODO 실제 요청 필요
+//        PaymentDTO paymentDTO = paymentClient.cancelPayment(reservation.getPaymentId()).getData();
+
+        // TODO : 임시-> 삭제
+        PaymentDTO paymentDTO = PaymentDTO.builder()
+                .paymentId(reservation.getId())
+                .paymentNo("PAY20250612001")
+                .amount(150000)
+                .approvedAt(LocalDateTime.of(2025, 6, 10, 14, 30))
+                .cancelledAt(LocalDateTime.of(2025, 6, 12, 9, 15))
+                .status("CANCELLED")
+                .build();
+
+
+        return paymentDTO;
     }
 }

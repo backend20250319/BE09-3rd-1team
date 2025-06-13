@@ -12,4 +12,5 @@ public class ReservationRequest {
     private final Long roomId;
     private final LocalDate startDate;
     private final LocalDate endDate;
+    private final int amount;
 }
