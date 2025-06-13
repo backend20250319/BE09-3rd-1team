@@ -33,14 +33,14 @@ public class GatewayJwtTokenProvider {
         }
     }
 
-    public String getUserIdFromJWT(String token) {
+    public Long getUserIdFromJWT(String token) {
         Claims claims = Jwts.parser()
             .verifyWith(secretKey)
             .build()
             .parseSignedClaims(token)
             .getPayload();
-        
-        return claims.getSubject();
+
+        return claims.get("userId", Long.class);
     }
 
     public String getRoleFromJWT(String token) {

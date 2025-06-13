@@ -36,14 +36,14 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             return exchange.getResponse().setComplete();
         }
 
-        String userId = gatewayJwtTokenProvider.getUserIdFromJWT(token);
+        Long userId = gatewayJwtTokenProvider.getUserIdFromJWT(token);
         String role = gatewayJwtTokenProvider.getRoleFromJWT(token);
 
         log.info("userId = {}", userId);
         log.info("role = {}", role);
 
         ServerHttpRequest mutateRequest = exchange.getRequest().mutate()
-            .header("X-User-Id", userId)
+            .header("X-User-Id", String.valueOf(userId))
             .header("X-User-Role", role)
             .build();
 
