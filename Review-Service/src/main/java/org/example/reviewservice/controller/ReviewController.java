@@ -2,11 +2,13 @@ package org.example.reviewservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.reviewservice.common.ApiResponse;
 import org.example.reviewservice.dto.ReviewRequest;
 import org.example.reviewservice.dto.ReviewResponse;
 import org.example.reviewservice.service.ReviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -18,30 +20,30 @@ public class ReviewController {
     private final ReviewService service;
 
     @PostMapping
-    public ResponseEntity<ReviewResponse> createReview(@Valid @RequestBody ReviewRequest request) {
+    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(@Valid @RequestBody ReviewRequest request) {
         ReviewResponse response = service.createReview(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReviewResponse> getReview(@Valid @PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ReviewResponse>> getReview(@Valid @PathVariable Long id) {
         ReviewResponse response = service.getReview(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping
-    public ResponseEntity<List<ReviewResponse>> getAllReviews() {
-        return ResponseEntity.ok(service.getAllReviews());
+    public ResponseEntity<ApiResponse<List<ReviewResponse>>> getAllReviews() {
+        return ResponseEntity.ok(ApiResponse.success(service.getAllReviews()));
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<ReviewResponse> updateReview(
+    public ResponseEntity<ApiResponse<ReviewResponse>> updateReview(
             @PathVariable Long id,
-            @RequestBody ReviewRequest request
+          @Valid  @RequestBody ReviewRequest request
     ) {
         ReviewResponse response = service.updateReview(id, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
 
@@ -52,12 +54,12 @@ public class ReviewController {
     }
 
     @GetMapping("/room/{roomName}")
-    public ResponseEntity<List<ReviewResponse>> getReviewsByRoom(@PathVariable String roomName) {
-        return ResponseEntity.ok(service.getReviewsByRoom(roomName));
+    public ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviewsByRoom(@PathVariable String roomName) {
+        return ResponseEntity.ok(ApiResponse.success(service.getReviewsByRoom(roomName)));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ReviewResponse>> getReviewsByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(service.getReviewsByUserId(userId));
+    public ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviewsByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(service.getReviewsByUserId(userId)));
     }
 }
