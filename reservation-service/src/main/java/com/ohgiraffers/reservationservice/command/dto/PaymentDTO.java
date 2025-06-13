@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class PaymentDTO {
+    // TODO : swagger 적용하기
 
     private Long paymentId;                  // 결제 식별자 (DB PK)
     private String paymentNo;                // 결제 번호 (예: PG사 고유번호 등)
