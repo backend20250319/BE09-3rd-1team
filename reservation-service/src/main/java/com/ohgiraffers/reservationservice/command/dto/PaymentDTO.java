@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 public class PaymentDTO {
 
-    private Long paymentId;                         // 결제 식별자 (DB PK)
+    private Long paymentId;                  // 결제 식별자 (DB PK)
     private String paymentNo;                // 결제 번호 (예: PG사 고유번호 등)
     private int amount;                      // 결제 금액
     private LocalDateTime approvedAt;        // 결제 승인 일시
