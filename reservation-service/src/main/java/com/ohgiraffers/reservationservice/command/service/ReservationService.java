@@ -119,29 +119,30 @@ public class ReservationService {
                 .collect(Collectors.toList());
 
         // 2. FeignClient로 room 정보 조회
-        RoomIdListRequest request = RoomIdListRequest.builder()
+        RoomIdListReqDTO request = RoomIdListReqDTO.builder()
                 .roomIdList(roomIds)
                 .build();
 
         // TODO : 실제 요청 필요
-//        List<RoomDTO> rooms = roomClient.getRoomIdList(request)
-//                .getData();
+        System.out.println("룸 요청 ---------" + request.getRoomIdList());
+        List<RoomDTO> rooms = roomClient.getRoomsByIds(request);
+        System.out.println("룸 요청 완료 ---------");
 
-        // TODO : 임시 -> 삭제
-        List<RoomDTO> rooms = roomIds.stream()
-                .map(roomId -> RoomDTO.builder()
-                        .roomId(roomId)
-                        .accommodationName("숙소명_" + roomId) // 테스트용 이름
-                        .location("테스트 지역")
-                        .roomType("스탠다드")
-                        .pricePerDay(100000)
-                        .sellerId(roomId + 100)
-                        .build())
-                .toList();
+//        // TODO : 임시 -> 삭제
+//        List<RoomDTO> rooms = roomIds.stream()
+//                .map(roomId -> RoomDTO.builder()
+//                        .roomId(roomId)
+//                        .accommodationName("숙소명_" + roomId) // 테스트용 이름
+//                        .location("테스트 지역")
+//                        .roomType("스탠다드")
+//                        .pricePerDay(100000)
+//                        .sellerId(roomId + 100)
+//                        .build())
+//                .toList();
 
         // 3. roomId -> RoomDTO 맵핑
         Map<Long, RoomDTO> roomMap = rooms.stream()
-                .collect(Collectors.toMap(RoomDTO::getRoomId, Function.identity()));
+                .collect(Collectors.toMap(RoomDTO::getId, Function.identity()));
 
         // 4. Reservation → ReservationDTO로 변환
         return reservations.stream()

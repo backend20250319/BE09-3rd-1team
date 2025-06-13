@@ -5,7 +5,7 @@ import lombok.*;
 @Getter
 @Builder
 public class RoomDTO {
-    private Long roomId;
+    private Long id;
     private String accommodationName;
     private String location;
     private String roomType;
