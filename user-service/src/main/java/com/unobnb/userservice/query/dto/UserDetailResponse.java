@@ -8,10 +8,10 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserResponse {
+public class UserDetailResponse {
 
     private Long id;
-    private String userid;
+    private String username;
     private UserRole role;
     private String name;
     private int age;

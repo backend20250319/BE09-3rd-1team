@@ -39,7 +39,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth ->
                 auth.requestMatchers(HttpMethod.POST, "/user", "/auth/login", "/auth/refresh")
                     .permitAll()
-                    .requestMatchers(HttpMethod.GET, "/user/me").hasAuthority("CUSTOMER")
+                    .requestMatchers(HttpMethod.GET, "/user/detail").hasAuthority("CUSTOMER")
                     .anyRequest().authenticated()
             )
             .addFilterBefore(headerAuthenticationFilter(),
