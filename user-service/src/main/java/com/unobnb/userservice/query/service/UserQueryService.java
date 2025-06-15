@@ -2,7 +2,7 @@ package com.unobnb.userservice.query.service;
 
 import com.unobnb.userservice.command.entity.User;
 import com.unobnb.userservice.command.repsoitory.UserRepository;
-import com.unobnb.userservice.query.dto.UserDetailResponse;
+import com.unobnb.userservice.query.dto.UserDetailResponseDTO;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,12 +13,12 @@ public class UserQueryService {
 
     private final UserRepository userRepository;
 
-    public UserDetailResponse getUser(Long userId) {
+    public UserDetailResponseDTO getUser(Long userId) {
         User user = userRepository
             .findById(userId).orElseThrow(() ->
                 new NotFoundException("유저 정보 찾지 못함"));
 
-        return UserDetailResponse.builder()
+        return UserDetailResponseDTO.builder()
             .id(user.getId())
             .username(user.getUsername())
             .age(user.getAge())

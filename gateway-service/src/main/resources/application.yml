@@ -45,3 +45,18 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+  # --- 이 부분이 핵심 설정입니다 ---
+springdoc:
+  swagger-ui:
+    # 게이트웨이의 Swagger UI에 표시될 그룹들의 이름을 지정합니다.
+    # 여기서 'user-service'는 아래 urls의 name과 일치해야 합니다.
+    urls-primary-name: user-service
+    # 여러 마이크로서비스의 api-docs 위치를 등록합니다.
+    # 이 설정을 통해 게이트웨이가 각 서비스의 API 명세를 취합할 수 있습니다.
+    urls:
+      - name: user-service # 그룹 선택 시 보일 이름
+        url: /api/v1/user-service/v3/api-docs # 게이트웨이를 통해 접근하는 user-service의 api-docs 경로
+      # 다른 서비스가 있다면 여기에 계속 추가합니다.
+      # - name: order-service
+      #   url: /api/v1/order-service/v3/api-docs

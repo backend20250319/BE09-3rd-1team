@@ -1,7 +1,7 @@
 package com.unobnb.userservice.query.controller;
 
 import com.unobnb.userservice.common.ApiResponse;
-import com.unobnb.userservice.query.dto.UserDetailResponse;
+import com.unobnb.userservice.query.dto.UserDetailResponseDTO;
 import com.unobnb.userservice.query.service.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
-public class UserQueryController {
+public class UserQueryController implements UserQueryControllerSwagger {
 
     private final UserQueryService userQueryService;
 
+    @Override
     @GetMapping("/detail")
-    public ResponseEntity<ApiResponse<UserDetailResponse>> getUserDetail(
+    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> getUserDetail(
         @AuthenticationPrincipal String userId) {
 
         log.info("[GET user/detail ] userId : {}", userId);
-        UserDetailResponse userDetailResponse = userQueryService.getUser(Long.parseLong(userId));
+        UserDetailResponseDTO userDetailResponse = userQueryService.getUser(Long.parseLong(userId));
 
         return ResponseEntity.ok(ApiResponse.success(userDetailResponse));
     }
-
 }
