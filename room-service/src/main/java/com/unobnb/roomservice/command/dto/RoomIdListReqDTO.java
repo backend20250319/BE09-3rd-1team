@@ -1,4 +1,4 @@
-package com.unobnb.roomservice.dto;
+package com.unobnb.roomservice.command.dto;
 import lombok.*;
 
 import java.util.List;
