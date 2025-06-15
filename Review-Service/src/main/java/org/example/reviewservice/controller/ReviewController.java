@@ -23,7 +23,6 @@ public class ReviewController {
     public ResponseEntity<ApiResponse<ReviewResponse>> createReview(
             @Valid @RequestBody ReviewRequest request,
             @AuthenticationPrincipal String userId
-
     ) {
         ReviewResponse response = service.createReview(request, Long.valueOf(userId));
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -43,6 +42,7 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}")
+
     @PreAuthorize("hasAnyAuthority('CUSTOMER')")
     public ResponseEntity<ApiResponse<ReviewResponse>> updateReview(
             @PathVariable Long id,
@@ -54,10 +54,12 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}")
+
     @PreAuthorize("hasAnyAuthority('CUSTOMER')")
     public ResponseEntity<Void> deleteReview(
             @PathVariable Long id,
             @AuthenticationPrincipal String userId
+
     ) {
         service.deleteReview(id, Long.valueOf(userId));
         return ResponseEntity.noContent().build();

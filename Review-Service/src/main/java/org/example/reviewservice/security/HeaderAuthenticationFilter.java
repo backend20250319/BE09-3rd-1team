@@ -22,6 +22,7 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
         System.out.println("HeaderAuthenticationFilter doFilterInternal >>>>>> ");
 
         String userIdStr = request.getHeader("X-User-Id");
