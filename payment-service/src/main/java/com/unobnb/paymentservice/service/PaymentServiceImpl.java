@@ -39,7 +39,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             return response;
         } else if (requestDto.getPrice() > 1_000_000) {
-            statusCode = 0; // 실패 처리로 통일
+            statusCode = 0; // 실패 처리
             statusText = "FAILED";
 
             PaymentResponseDto response = new PaymentResponseDto();
@@ -101,6 +101,30 @@ public class PaymentServiceImpl implements PaymentService {
         response.setApprovedAt(payment.getPaymentDate());
         response.setCancelledAt(payment.getCancelDate());
         response.setStatus("CANCELLED");
+
+        return response;
+    }
+
+    @Override
+    public PaymentResponseDto getPayment(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("해당 결제를 찾을 수 없습니다: ID = " + paymentId));
+
+        String statusText;
+        switch (payment.getStatus()) {
+            case 0 -> statusText = "FAILED";
+            case 1 -> statusText = "SUCCESS";
+            case 2 -> statusText = "CANCELLED";
+            default -> statusText = "UNKNOWN";
+        }
+
+        PaymentResponseDto response = new PaymentResponseDto();
+        response.setPaymentId(payment.getId());
+        response.setPaymentNo(payment.getPaymentNo());
+        response.setPrice(payment.getPrice());
+        response.setApprovedAt(payment.getPaymentDate());
+        response.setCancelledAt(payment.getCancelDate());
+        response.setStatus(statusText);
 
         return response;
     }

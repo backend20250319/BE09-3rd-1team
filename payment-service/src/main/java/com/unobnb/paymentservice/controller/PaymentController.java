@@ -23,6 +23,11 @@ public class PaymentController {
 
     @PostMapping("/cancel")
     public PaymentResponseDto cancelPayment(@RequestBody PaymentCancelRequestDto requestDto) {
-        return paymentService.cancelPayment(requestDto); // ✅ 같은 타입으로!
+        return paymentService.cancelPayment(requestDto);
+    }
+
+    @GetMapping("/{paymentId}")
+    public PaymentResponseDto getPayment(@PathVariable Long paymentId) {
+        return paymentService.getPayment(paymentId);
     }
 }
