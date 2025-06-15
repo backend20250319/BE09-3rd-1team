@@ -8,6 +8,7 @@ import org.example.reviewservice.dto.ReviewResponse;
 import org.example.reviewservice.service.ReviewService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -19,10 +20,11 @@ public class ReviewController {
     private final ReviewService service;
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+//    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<ApiResponse<ReviewResponse>> createReview(
             @Valid @RequestBody ReviewRequest request,
-            @RequestHeader("X-User-Id") Long userId
+            @AuthenticationPrincipal Long userId
+//            @RequestHeader("X-User-Id") Long userId
     ) {
         ReviewResponse response = service.createReview(request, userId);
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -46,17 +48,19 @@ public class ReviewController {
     public ResponseEntity<ApiResponse<ReviewResponse>> updateReview(
             @PathVariable Long id,
             @Valid @RequestBody ReviewRequest request,
-            @RequestHeader("X-User-Id") Long userId
+            @AuthenticationPrincipal Long userId
+//            @RequestHeader("X-User-Id") Long userId
     ) {
         ReviewResponse response = service.updateReview(id, request, userId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+//    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<Void> deleteReview(
             @PathVariable Long id,
-            @RequestHeader("X-User-Id") Long userId
+            @AuthenticationPrincipal Long userId
+//            @RequestHeader("X-User-Id") Long userId
     ) {
         service.deleteReview(id, userId);
         return ResponseEntity.noContent().build();
