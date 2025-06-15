@@ -6,5 +6,6 @@ import com.unobnb.paymentservice.dto.PaymentCancelRequestDto;
 
 public interface PaymentService {
     PaymentResponseDto processPayment(PaymentRequestDto requestDto);
-    PaymentResponseDto cancelPayment(PaymentCancelRequestDto requestDto); // ✅ 여기 리턴 타입!
+    PaymentResponseDto cancelPayment(PaymentCancelRequestDto requestDto);
+    PaymentResponseDto getPayment(Long paymentId); // ✅ 결제 조회 추가
 }
