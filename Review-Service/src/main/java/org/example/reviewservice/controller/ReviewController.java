@@ -29,14 +29,12 @@ public class ReviewController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("permitAll()")
     public ResponseEntity<ApiResponse<ReviewResponse>> getReview(@PathVariable Long id) {
         ReviewResponse response = service.getReview(id);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping
-    @PreAuthorize("permitAll()")
     public ResponseEntity<ApiResponse<List<ReviewResponse>>> getAllReviews() {
         return ResponseEntity.ok(ApiResponse.success(service.getAllReviews()));
     }
@@ -66,13 +64,11 @@ public class ReviewController {
     }
 
     @GetMapping("/room/{roomName}")
-    @PreAuthorize("permitAll()")
     public ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviewsByRoom(@PathVariable String roomName) {
         return ResponseEntity.ok(ApiResponse.success(service.getReviewsByRoom(roomName)));
     }
 
     @GetMapping("/user/{userId}")
-    @PreAuthorize("permitAll()")
     public ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviewsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(ApiResponse.success(service.getReviewsByUserId(userId)));
     }
