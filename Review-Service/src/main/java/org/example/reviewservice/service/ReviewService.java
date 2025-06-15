@@ -22,7 +22,7 @@ public class ReviewService {
         ReviewEntity review = ReviewEntity.builder()
                 .rate(request.getRate())
                 .content(request.getContent())
-                .userId(userId) // 헤더에서 받은 userId 사용
+                .userId(userId)
                 .room(request.getRoom())
                 .build();
 
@@ -47,9 +47,6 @@ public class ReviewService {
         ReviewEntity review = reviewRepository.findById(id)
                 .orElseThrow(() -> new GlobalExceptionHandler.ReviewNotFoundException("리뷰를 찾을 수 없습니다: " + id));
 
-        // 소유권 확인: 소유자 또는 ADMIN만 업데이트할 수 있습니다.
-        // 필요한 경우 '또는 ADMIN' 역할 확인을 여기에 추가할 수 있지만,
-        // 현재는 컨트롤러의 @PreAuthorize가 역할을 처리한다고 가정합니다.
         if (!review.getUserId().equals(callingUserId)) {
             throw new GlobalExceptionHandler.UnauthorizedAccessException("리뷰를 수정할 권한이 없습니다.");
         }
@@ -57,7 +54,7 @@ public class ReviewService {
         review.setRate(request.getRate());
         review.setContent(request.getContent());
         review.setRoom(request.getRoom());
-        // review.setUserId(request.getUserId()); // userId는 업데이트 시 변경되어서는 안 됩니다.
+
 
         ReviewEntity updated = reviewRepository.save(review);
         return toResponse(updated);
@@ -67,7 +64,6 @@ public class ReviewService {
         ReviewEntity review = reviewRepository.findById(id)
                 .orElseThrow(() -> new GlobalExceptionHandler.ReviewNotFoundException("삭제할 리뷰를 찾을 수 없습니다: " + id));
 
-        // 소유권 확인: 소유자 또는 ADMIN만 삭제할 수 있습니다.
         if (!review.getUserId().equals(callingUserId)) {
             throw new GlobalExceptionHandler.UnauthorizedAccessException("리뷰를 삭제할 권한이 없습니다.");
         }
