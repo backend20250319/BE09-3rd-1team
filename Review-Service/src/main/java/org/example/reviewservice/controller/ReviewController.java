@@ -20,13 +20,11 @@ public class ReviewController {
     private final ReviewService service;
 
     @PostMapping
-//    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<ApiResponse<ReviewResponse>> createReview(
             @Valid @RequestBody ReviewRequest request,
-            @AuthenticationPrincipal Long userId
-//            @RequestHeader("X-User-Id") Long userId
+            @AuthenticationPrincipal String userId
     ) {
-        ReviewResponse response = service.createReview(request, userId);
+        ReviewResponse response = service.createReview(request, Long.valueOf(userId));
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -44,25 +42,26 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+
+    @PreAuthorize("hasAnyAuthority('CUSTOMER')")
     public ResponseEntity<ApiResponse<ReviewResponse>> updateReview(
             @PathVariable Long id,
             @Valid @RequestBody ReviewRequest request,
-            @AuthenticationPrincipal Long userId
-//            @RequestHeader("X-User-Id") Long userId
+            @AuthenticationPrincipal String userId
     ) {
-        ReviewResponse response = service.updateReview(id, request, userId);
+        ReviewResponse response = service.updateReview(id, request, Long.valueOf(userId));
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @DeleteMapping("/{id}")
-//    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+
+    @PreAuthorize("hasAnyAuthority('CUSTOMER')")
     public ResponseEntity<Void> deleteReview(
             @PathVariable Long id,
-            @AuthenticationPrincipal Long userId
-//            @RequestHeader("X-User-Id") Long userId
+            @AuthenticationPrincipal String userId
+
     ) {
-        service.deleteReview(id, userId);
+        service.deleteReview(id, Long.valueOf(userId));
         return ResponseEntity.noContent().build();
     }
 

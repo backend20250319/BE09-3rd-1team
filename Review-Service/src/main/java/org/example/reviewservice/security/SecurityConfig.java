@@ -43,9 +43,10 @@ public class SecurityConfig {
                                         "/webjars/**",
                                         "/swagger-resources/**"
                                 ).permitAll()
-                                .requestMatchers(HttpMethod.POST, "/reviews").hasAnyAuthority("CUSTOMER", "ADMIN")
-                                .requestMatchers(HttpMethod.PUT, "/reviews/**").hasAnyAuthority("CUSTOMER", "ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/reviews/**").hasAnyAuthority("CUSTOMER", "ADMIN")
+
+                                .requestMatchers(HttpMethod.POST, "/reviews").hasAuthority("CUSTOMER")
+                                .requestMatchers(HttpMethod.PUT, "/reviews/**").hasAuthority("CUSTOMER")
+                                .requestMatchers(HttpMethod.DELETE, "/reviews/**").hasAuthority("CUSTOMER")
                                 .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
                                 .anyRequest().authenticated()
                 )
