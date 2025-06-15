@@ -13,14 +13,12 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 리뷰를 찾을 수 없을 때 발생하는 사용자 정의 예외
     public static class ReviewNotFoundException extends RuntimeException {
         public ReviewNotFoundException(String message) {
             super(message);
         }
     }
 
-    // 권한 없는 접근(예: 다른 사람의 리뷰를 수정하려는 시도)에 대한 사용자 정의 예외
     public static class UnauthorizedAccessException extends RuntimeException {
         public UnauthorizedAccessException(String message) {
             super(message);
@@ -35,7 +33,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedAccessException.class)
     public ResponseEntity<ApiResponse<?>> handleUnauthorizedAccessException(UnauthorizedAccessException ex, WebRequest request) {
-        // 게이트웨이가 인증(당신이 누구인지)을 처리했으므로, 이것은 인가(무엇을 할 수 있는지)에 관한 것이므로 403 Forbidden을 사용합니다.
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ApiResponse.failure("UNAUTHORIZED_ACCESS", ex.getMessage()));
     }
