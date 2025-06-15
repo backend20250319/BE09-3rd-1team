@@ -1,4 +1,4 @@
-package com.unobnb.roomservice.entity;
+package com.unobnb.roomservice.command.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

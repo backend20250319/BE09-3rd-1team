@@ -1,9 +1,9 @@
-package com.unobnb.roomservice.service;
+package com.unobnb.roomservice.command.service;
 
-import com.unobnb.roomservice.dto.RoomDTO;
-import com.unobnb.roomservice.dto.RoomUpdateReqDTO;
-import com.unobnb.roomservice.entity.Room;
-import com.unobnb.roomservice.repository.RoomRepository;
+import com.unobnb.roomservice.command.dto.RoomDTO;
+import com.unobnb.roomservice.command.dto.RoomUpdateReqDTO;
+import com.unobnb.roomservice.command.entity.Room;
+import com.unobnb.roomservice.command.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -22,6 +22,10 @@ public class RoomService {
     @Transactional
     public RoomDTO save(RoomDTO roomDTO) {
         Room room = modelMapper.map(roomDTO, Room.class);
+
+        if (room.getSellerId() == null) {
+            throw new IllegalArgumentException("sellerId는 필수입니다.");
+        }
         Room saved = roomRepository.save(room);
         return modelMapper.map(saved, RoomDTO.class);
     }
@@ -34,7 +38,7 @@ public class RoomService {
 
     public RoomDTO findById(Long id) {
         Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+                .orElseThrow(() -> new IllegalArgumentException("해당 방이 없습니다."));
         return modelMapper.map(room, RoomDTO.class);
     }
 
@@ -42,6 +46,10 @@ public class RoomService {
     public RoomUpdateReqDTO updated(RoomUpdateReqDTO roomUpdateReqDTO) {
         Room room = roomRepository.findById(roomUpdateReqDTO.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 방이 없습니다."));
+
+        if (!room.getSellerId().equals(roomUpdateReqDTO.getSellerId())) {
+            throw new SecurityException("판매자만 수정할 수 있습니다.");
+        }
 
         room.setAccommodationName(roomUpdateReqDTO.getAccommodationName());
         room.setLocation(roomUpdateReqDTO.getLocation());
@@ -62,4 +70,17 @@ public class RoomService {
     public void deleteById(Long id) {
         roomRepository.deleteById(id);
     }
+
+    @Transactional
+    public void deleteRoomWithAuth(Long roomId, Long sellerId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 방이 없습니다."));
+
+        if (!room.getSellerId().equals(sellerId)) {
+            throw new SecurityException("판매자만 삭제할 수 있습니다.");
+        }
+        roomRepository.deleteById(roomId);
+    }
+
+
 }
