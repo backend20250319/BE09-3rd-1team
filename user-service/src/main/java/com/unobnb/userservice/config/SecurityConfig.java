@@ -37,7 +37,8 @@ public class SecurityConfig {
                         .authenticationEntryPoint(restAuthenticationEntryPoint)
             )
             .authorizeHttpRequests(auth ->
-                auth.requestMatchers(HttpMethod.POST, "/user", "/auth/login", "/auth/refresh")
+                auth.requestMatchers(HttpMethod.POST, "/user", "/auth/login", "/auth/refresh",
+                        "/auth/logout")
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/user/detail")
                     .hasAnyAuthority("CUSTOMER", "SELLER")
