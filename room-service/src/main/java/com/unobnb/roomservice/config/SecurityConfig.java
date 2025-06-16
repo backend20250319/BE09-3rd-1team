@@ -50,7 +50,8 @@ public class SecurityConfig {
 
 
                         .requestMatchers(HttpMethod.GET, "/rooms/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/rooms/**").hasRole("SELLER")
+                        .requestMatchers(HttpMethod.POST, "/rooms").hasRole("SELLER")
+                        .requestMatchers(HttpMethod.POST, "/rooms/batch").hasAnyRole("SELLER", "CUSTOMER")
                         .requestMatchers(HttpMethod.PUT, "/rooms/**").hasRole("SELLER")
                         .requestMatchers(HttpMethod.DELETE, "/rooms/**").hasRole("SELLER")
 

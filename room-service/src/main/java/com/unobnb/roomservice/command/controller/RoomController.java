@@ -6,6 +6,7 @@ import com.unobnb.roomservice.command.dto.RoomUpdateReqDTO;
 import com.unobnb.roomservice.command.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,8 +55,11 @@ public class RoomController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('SELLER') or hasRole('CUSTOMER')")
     @PostMapping("/batch")
-    public ResponseEntity<List<RoomDTO>> getRoomsByIds(@RequestBody RoomIdListReqDTO request) {
+    public ResponseEntity<List<RoomDTO>> getRoomsByIds(
+            @AuthenticationPrincipal String userId,
+            @RequestBody RoomIdListReqDTO request) {
         return ResponseEntity.ok(roomService.findRoomsByIds(request.getRoomIdList()));
     }
 
