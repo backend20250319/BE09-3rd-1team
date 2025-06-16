@@ -21,7 +21,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        String jsonResponse = "{\"error\": \"Forbidden\", \"message\": \"" + accessDeniedException.getMessage() + "\"}";
+        String jsonResponse = "{\"error\": \"Forbidden\", \"message\": \"권한이 없습니다." + "\"}";
         response.getWriter().write(jsonResponse);
     }
 }
