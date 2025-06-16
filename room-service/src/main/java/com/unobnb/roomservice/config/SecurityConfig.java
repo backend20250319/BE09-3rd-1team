@@ -39,15 +39,6 @@ public class SecurityConfig {
                                 .accessDeniedHandler(restAccessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**",
-                                "/v3/api-docs",
-                                "/swagger-resources/**",
-                                "/webjars/**"
-                        ).permitAll()
-
 
                         .requestMatchers(HttpMethod.GET, "/rooms/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/rooms").hasRole("SELLER")
@@ -55,6 +46,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/rooms/**").hasRole("SELLER")
                         .requestMatchers(HttpMethod.DELETE, "/rooms/**").hasRole("SELLER")
 
+
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**",
+                                "/swagger-resources/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(headerAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
