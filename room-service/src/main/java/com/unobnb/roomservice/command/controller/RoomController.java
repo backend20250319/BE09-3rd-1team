@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/rooms")
 @RequiredArgsConstructor
-public class RoomController {
+public class RoomController implements RoomControllerSwagger{
 
     private final RoomService roomService;
 
