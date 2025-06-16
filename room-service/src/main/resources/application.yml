@@ -3,6 +3,8 @@ server:
 spring:
   profiles:
     active: dev
+  application:
+    name: room-service
 
 eureka:
   instance:

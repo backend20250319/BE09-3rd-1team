@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Swagger 문서 접근 허용
+
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -36,8 +36,8 @@ public class SecurityConfig {
                                 "/webjars/**"
                         ).permitAll()
 
-                        // ✅ 실제 서비스 API 보안 설정
-                        .requestMatchers(HttpMethod.GET, "/api/v1/room-service/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/rooms/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/room-service/**").hasAuthority("seller")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/room-service/**").hasAuthority("seller")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/room-service/**").hasAuthority("seller")
