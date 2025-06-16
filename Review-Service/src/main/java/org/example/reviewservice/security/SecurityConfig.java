@@ -25,33 +25,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(exception ->
-                        exception
-                                .authenticationEntryPoint(restAuthenticationEntryPoint)
-                                .accessDeniedHandler(restAccessDeniedHandler)
-                )
-                .authorizeHttpRequests(auth ->
-                        auth
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(exception ->
+                exception
+                    .authenticationEntryPoint(restAuthenticationEntryPoint)
+                    .accessDeniedHandler(restAccessDeniedHandler)
+            )
+            .authorizeHttpRequests(auth ->
+                auth
 
-                                .requestMatchers(
-                                        "/v3/api-docs/**",
-                                        "/swagger-ui/**",
-                                        "/swagger-ui.html",
-                                        "/webjars/**",
-                                        "/swagger-resources/**"
-                                ).permitAll()
+                    .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/webjars/**",
+                        "/swagger-resources/**"
+                    ).permitAll()
 
-                                .requestMatchers(HttpMethod.POST, "/reviews").hasAuthority("CUSTOMER")
-                                .requestMatchers(HttpMethod.PUT, "/reviews/**").hasAuthority("CUSTOMER")
-                                .requestMatchers(HttpMethod.DELETE, "/reviews/**").hasAuthority("CUSTOMER")
-                                .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
-                                .anyRequest().authenticated()
-                )
+                    .requestMatchers(HttpMethod.POST, "/reviews").hasAuthority("CUSTOMER")
+                    .requestMatchers(HttpMethod.PUT, "/reviews/**").hasAuthority("CUSTOMER")
+                    .requestMatchers(HttpMethod.DELETE, "/reviews/**").hasAuthority("CUSTOMER")
+                    .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**",
+                        "/swagger-resources/**").permitAll()
+                    .anyRequest().authenticated()
+            )
 
-                .addFilterBefore(headerAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(headerAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
