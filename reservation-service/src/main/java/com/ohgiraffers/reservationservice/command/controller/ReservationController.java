@@ -7,16 +7,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Validated
 @Tag(name = "Reservation API", description = "예약 관련 기능을 제공합니다.")
 @RestController
 @RequiredArgsConstructor
@@ -27,11 +31,11 @@ public class ReservationController {
 
     // 1. 예약(권한 = CUSTOMER)
     @Operation(
-            summary = "예약 생성", description = "숙소를 예약합니다.", security = @SecurityRequirement(name = "Authorization"))
+            summary = "숙소 예약", description = "숙소를 예약합니다.", security = @SecurityRequirement(name = "Authorization"))
     @PostMapping
     public ResponseEntity<ApiResponse<ReservationResponse>> createReservation(
             @AuthenticationPrincipal String userId,
-            @RequestBody ReservationRequest reservationRequest) {
+            @Valid @RequestBody ReservationRequest reservationRequest) {
 
         ReservationResponse reservationResponse = reservationService.createReservation(
                 reservationRequest, Long.valueOf(userId));
@@ -52,6 +56,7 @@ public class ReservationController {
             @Parameter(description = "조회할 숙소 ID", example = "1")
             @PathVariable Long roomId,
             @Parameter(description = "조회할 연월 (yyyy-MM)", example = "2025-06")
+            @Pattern(regexp = "\\d{4}-\\d{2}", message = "yearMonth must be in the format yyyy-MM")
             @RequestParam String yearMonth) {
 
         ReservationDateResponse reservationDateResponse = reservationService.getReservedDates(roomId, yearMonth);
@@ -76,15 +81,15 @@ public class ReservationController {
 
     // 5. 예약 취소(권한 = CUSTOMER)
     @Operation(summary = "예약 취소", description = "예약을 취소합니다.", security = @SecurityRequirement(name = "Authorization"))
-    @PutMapping("/{reservation-id}/cancel")
-    public ResponseEntity<ApiResponse<PaymentDTO>> cancelReservation(
+    @PutMapping("/{reservationId}/cancel")
+    public ResponseEntity<ApiResponse<ReservationCancelResponse>> cancelReservation(
             @AuthenticationPrincipal String userId,
             @Parameter(description = "취소할 예약 ID", example = "1")
-            @PathVariable("reservation-id") Long reservationId) {
+            @PathVariable Long reservationId) {
 
-        PaymentDTO paymentDTO = reservationService.cancelReservation(reservationId);
+        ReservationCancelResponse reservationCancelResponse = reservationService.cancelReservation(Long.valueOf(userId), reservationId);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.success(paymentDTO));
+                .body(ApiResponse.success(reservationCancelResponse));
     }
 }

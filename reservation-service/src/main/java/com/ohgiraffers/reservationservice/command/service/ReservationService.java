@@ -6,9 +6,15 @@ import com.ohgiraffers.reservationservice.command.dto.*;
 import com.ohgiraffers.reservationservice.command.entity.Reservation;
 import com.ohgiraffers.reservationservice.command.entity.ReservationStatus;
 import com.ohgiraffers.reservationservice.command.repository.ReservationRepository;
+import feign.FeignException;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,26 +31,40 @@ public class ReservationService {
     private final PaymentClient paymentClient;
     private final RoomClient roomClient;
 
-    public String generateReservationNo(String startDate, String endDate) {
-        // 날짜 형식을 yyyyMMdd로 포맷
-        String start = startDate.replaceAll("-", ""); // ex: 2025-06-12 → 20250612
-        String end = endDate.replaceAll("-", "");
-
-        // 랜덤 숫자 4자리 생성
-        Random random = new Random();
-        int randomNumber = 1000 + random.nextInt(9000); // 1000~9999
-
-        return start + end + randomNumber;
-    }
-
     // 예약 생성
     @Transactional
     public ReservationResponse createReservation(ReservationRequest reservationRequest, Long userId) {
 
-        // TODO 실제 요청 필요
-//        PaymentDTO paymentDTO = paymentClient.createPayment(reservationRequest.getAmount()).getData();
-//        Long paymentId = paymentDTO.getPaymentId();
-        Long paymentId = 1L;
+        // 1. 숙소 ID 검증
+        try {
+            RoomDTO room = roomClient.getRoomById(reservationRequest.getRoomId());
+            if (!room.getId()
+                    .equals(reservationRequest.getRoomId())) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found");
+            }
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found");
+        }
+
+        // 2. 중복 예약 방지
+        List<Reservation> overlappingReservations = reservationRepository.findOverlappingReservations(
+                reservationRequest.getRoomId(),
+                reservationRequest.getStartDate(),
+                reservationRequest.getEndDate()
+        );
+        if (!overlappingReservations.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Overlapping Reservations");
+        }
+
+
+        // 결제 생성
+        Long paymentId;
+        try {
+            PaymentDTO paymentDTO = paymentClient.processPayment(new PaymentRequest(reservationRequest.getAmount()));
+            paymentId = paymentDTO.getPaymentId();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Payment failed");
+        }
 
         // 2. 예약 번호 생성
         String resvNo = generateReservationNo(
@@ -77,10 +97,22 @@ public class ReservationService {
         LocalDate startDate = ym.atDay(1);   // 2025-06-01
         LocalDate endDate = ym.atEndOfMonth();          // 2025-06-30
 
+        // 1. 숙소 ID 검증
+        RoomDTO room;
+        try {
+            room = roomClient.getRoomById(roomId);
+            if (!room.getId()
+                    .equals(roomId)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found");
+            }
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found");
+        }
+
         // CONFIRMED 확정 상태인 예약만 조회
         List<Reservation> reservations = reservationRepository
                 .findByRoomIdAndStatusAndEndDateGreaterThanEqualAndStartDateLessThanEqual(
-                        roomId,
+                        room.getId(),
                         ReservationStatus.CONFIRMED,
                         startDate,
                         endDate
@@ -119,26 +151,12 @@ public class ReservationService {
                 .collect(Collectors.toList());
 
         // 2. FeignClient로 room 정보 조회
-        RoomIdListReqDTO request = RoomIdListReqDTO.builder()
+        RoomListRequest request = RoomListRequest.builder()
                 .roomIdList(roomIds)
                 .build();
 
-        // TODO : 실제 요청 필요
-        System.out.println("룸 요청 ---------" + request.getRoomIdList());
+        // 3. 예약 숙소 목록 요청
         List<RoomDTO> rooms = roomClient.getRoomsByIds(request);
-        System.out.println("룸 요청 완료 ---------");
-
-//        // TODO : 임시 -> 삭제
-//        List<RoomDTO> rooms = roomIds.stream()
-//                .map(roomId -> RoomDTO.builder()
-//                        .roomId(roomId)
-//                        .accommodationName("숙소명_" + roomId) // 테스트용 이름
-//                        .location("테스트 지역")
-//                        .roomType("스탠다드")
-//                        .pricePerDay(100000)
-//                        .sellerId(roomId + 100)
-//                        .build())
-//                .toList();
 
         // 3. roomId -> RoomDTO 맵핑
         Map<Long, RoomDTO> roomMap = rooms.stream()
@@ -154,31 +172,73 @@ public class ReservationService {
                         .resvNo(reservation.getResvNo())
                         .startDate(reservation.getStartDate())
                         .endDate(reservation.getEndDate())
-                        .status(reservation.getStatus().toString())
+                        .status(reservation.getStatus()
+                                .toString())
                         .room(roomMap.get(reservation.getRoomId()))
                         .build())
                 .collect(Collectors.toList());
     }
 
     // 예약 취소
-    public PaymentDTO cancelReservation(Long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("예약 정보를 찾을 수 없습니다."));
+    public ReservationCancelResponse cancelReservation(Long userId, Long reservationId) {
+        Reservation reservation = reservationRepository.findByIdAndUserId(reservationId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "do not have permission"));
 
-//        // TODO 실제 요청 필요
-//        PaymentDTO paymentDTO = paymentClient.cancelPayment(reservation.getPaymentId()).getData();
+        // 이미 취소된 예약
+        if(reservation.getStatus().equals(ReservationStatus.CANCELLED)){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "This reservation has already been cancelled"
+            );
+        }
 
-        // TODO : 임시-> 삭제
-        PaymentDTO paymentDTO = PaymentDTO.builder()
-                .paymentId(reservation.getId())
-                .paymentNo("PAY20250612001")
-                .amount(150000)
-                .approvedAt(LocalDateTime.of(2025, 6, 10, 14, 30))
-                .cancelledAt(LocalDateTime.of(2025, 6, 12, 9, 15))
-                .status("CANCELLED")
+        // 24시간 이전 취소만 허용
+        LocalDateTime now = LocalDateTime.now();
+
+        // startDate는 자정(00:00) 기준이므로 LocalDateTime으로 변환
+        LocalDateTime reservationStartDateTime = reservation.getStartDate()
+                .atStartOfDay();
+
+        // 예약 시간이 현재로부터 24시간 이내면 취소 불가
+        if (reservationStartDateTime.isBefore(now.plusHours(24))) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Reservations can only be cancelled 24 hours prior to the check-in time"
+            );
+        }
+
+        Long paymentId;
+        try {
+            PaymentDTO paymentDTO = paymentClient.cancelPayment(new PaymentCancelRequest(reservation.getPaymentId()));
+            if (!paymentDTO.getStatus()
+                    .equals("CANCELLED")) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Payment cancellation failed");
+            }
+            paymentId = paymentDTO.getPaymentId();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Payment cancellation failed");
+        }
+
+        // 예약 취소
+        reservation.setStatus(ReservationStatus.CANCELLED);
+        reservationRepository.save(reservation);
+
+
+        return ReservationCancelResponse.builder()
+                .reservationId(reservation.getId())
                 .build();
+    }
 
+    // 예약 번호 생성
+    public String generateReservationNo(String startDate, String endDate) {
+        // 날짜 형식을 yyyyMMdd로 포맷
+        String start = startDate.replaceAll("-", ""); // ex: 2025-06-12 → 20250612
+        String end = endDate.replaceAll("-", "");
 
-        return paymentDTO;
+        // 랜덤 숫자 4자리 생성
+        Random random = new Random();
+        int randomNumber = 1000 + random.nextInt(9000); // 1000~9999
+
+        return start + end + randomNumber;
     }
 }
