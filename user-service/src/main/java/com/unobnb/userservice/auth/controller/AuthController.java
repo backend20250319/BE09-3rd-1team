@@ -20,10 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Slf4j
-public class AuthController {
+public class AuthController implements AuthControllerSwagger {
 
     private final AuthService authService;
 
+    @Override
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenResponseDTO>> loin(
         @RequestBody LoginRequestDTO requestDTO) {
@@ -32,6 +33,7 @@ public class AuthController {
         return buildTokenResponse(responseDTO);
     }
 
+    @Override
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<TokenResponseDTO>> refresh(
         @CookieValue String refreshToken) {
@@ -42,6 +44,7 @@ public class AuthController {
         return buildTokenResponse(responseDTO);
     }
 
+    @Override
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
         @CookieValue String refreshToken) {

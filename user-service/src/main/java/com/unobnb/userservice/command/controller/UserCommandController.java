@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("user")
 @RequiredArgsConstructor
-public class UserController {
+public class UserCommandController implements UserCommandControllerSwagger {
 
     private final UserService userService;
 
+    @Override
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> register(
         @RequestBody UserCreateRequestDTO requestDto) {
