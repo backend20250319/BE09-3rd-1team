@@ -21,6 +21,6 @@ public class RoomDTO {
     @Schema(description = "일박 요금", example = "300000")
     private int pricePerDay;
 
-    @Schema(description = "숙박업자 ID", example = "343")
+    @Schema(description = "판매자 ID", example = "343")
     private Long sellerId;
 }

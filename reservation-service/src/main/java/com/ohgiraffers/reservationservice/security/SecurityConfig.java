@@ -23,6 +23,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        System.out.println("security filter chain  >>>>>> ");
+
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session
                         -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -36,7 +38,7 @@ public class SecurityConfig {
 //                                .requestMatchers(HttpMethod.GET, "/get-test", "/**")
 //                                .permitAll()
                                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/reservations/reserved-dates")
+                                        .requestMatchers(HttpMethod.GET, "/reservations/*/reserved-dates")
                                         .permitAll()
                                         .requestMatchers("/reservations/**")
                                         .hasAuthority("CUSTOMER")

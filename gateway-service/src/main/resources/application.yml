@@ -46,3 +46,18 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
+
+springdoc:
+  swagger-ui:
+    urls-primary-name: user-service  # 기본으로 선택될 서비스 (원하는 걸로 설정)
+    urls:
+      - name: user-service
+        url: /api/v1/user-service/v3/api-docs
+      - name: reservation-service
+        url: /api/v1/reservation-service/v3/api-docs
+      - name: room-service
+        url: /api/v1/room-service/v3/api-docs
+      - name: review-service
+        url: /api/v1/review-service/v3/api-docs
+      - name: payment-service
+        url: /api/v1/payment-service/v3/api-docs
