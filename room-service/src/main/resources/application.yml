@@ -1,8 +1,8 @@
-server:
-  port: 8899
 spring:
   profiles:
     active: dev
+  application:
+    name: room-service
 
 eureka:
   instance:
@@ -12,3 +12,11 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka
+      
+springdoc:
+  packages-to-scan: com.unobnb.roomservice
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+server:
+  port: 0
+  forward-headers-strategy: framework

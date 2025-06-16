@@ -15,7 +15,7 @@ public class UserCreateRequestDTO {
     @Schema(description = "비밀번호", example = "pass01")
     private String password;
 
-    @Schema(description = "회원 종류", example = "CUSTOMEr")
+    @Schema(description = "회원 종류", example = "CUSTOMER")
     private UserRole role;
 
     @Schema(description = "이름", example = "홍길동")

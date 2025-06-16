@@ -6,7 +6,9 @@ import com.unobnb.roomservice.command.dto.RoomUpdateReqDTO;
 import com.unobnb.roomservice.command.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,14 +17,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/rooms")
 @RequiredArgsConstructor
-public class RoomController {
+public class RoomController implements RoomControllerSwagger{
 
     private final RoomService roomService;
 
     @PostMapping
-    public ResponseEntity<RoomDTO> createRoom(@RequestBody RoomDTO roomDTO) {
-        Long sellerId = getSellerIdFromAuth();
-        roomDTO.setSellerId(sellerId);
+    public ResponseEntity<RoomDTO> createRoom(@AuthenticationPrincipal String userId, @RequestBody RoomDTO roomDTO) {
+        roomDTO.setSellerId(Long.valueOf(userId));
         return ResponseEntity.ok(roomService.save(roomDTO));
     }
 
@@ -38,23 +39,27 @@ public class RoomController {
 
     @PutMapping("/{id}")
     public ResponseEntity<RoomUpdateReqDTO> updateRoom(
+            @AuthenticationPrincipal String userId,
             @PathVariable Long id,
             @RequestBody RoomUpdateReqDTO roomUpdateReqDTO) {
-        Long sellerId = getSellerIdFromAuth();
         roomUpdateReqDTO.setId(id);
-        roomUpdateReqDTO.setSellerId(sellerId);
+        roomUpdateReqDTO.setSellerId(Long.valueOf(userId));
         return ResponseEntity.ok(roomService.updated(roomUpdateReqDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
-        Long sellerId = getSellerIdFromAuth();
-        roomService.deleteRoomWithAuth(id, sellerId);
+    public ResponseEntity<Void> deleteRoom(
+            @AuthenticationPrincipal String userId,
+            @PathVariable Long id) {
+        roomService.deleteRoomWithAuth(id, Long.valueOf(userId));
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('SELLER') or hasRole('CUSTOMER')")
     @PostMapping("/batch")
-    public ResponseEntity<List<RoomDTO>> getRoomsByIds(@RequestBody RoomIdListReqDTO request) {
+    public ResponseEntity<List<RoomDTO>> getRoomsByIds(
+            @AuthenticationPrincipal String userId,
+            @RequestBody RoomIdListReqDTO request) {
         return ResponseEntity.ok(roomService.findRoomsByIds(request.getRoomIdList()));
     }
 

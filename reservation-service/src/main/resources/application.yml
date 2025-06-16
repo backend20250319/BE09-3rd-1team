@@ -1,6 +1,10 @@
+springdoc:
+  packages-to-scan: com.ohgiraffers.reservationservice
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
 server:
-#  port: 0
-  port: 9999
+  port: 0
+  forward-headers-strategy: framework
 
 eureka:
   instance:

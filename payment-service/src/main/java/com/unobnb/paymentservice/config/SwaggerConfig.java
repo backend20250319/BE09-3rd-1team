@@ -1,4 +1,4 @@
-package com.unobnb.userservice.config;
+package com.unobnb.paymentservice.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -16,22 +16,22 @@ public class SwaggerConfig {
         String jwt = "JWT";
         SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwt);
         Components components = new Components().addSecuritySchemes(jwt, new SecurityScheme()
-                .name(jwt)
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("bearer")
-                .bearerFormat("JWT")
+            .name(jwt)
+            .type(SecurityScheme.Type.HTTP)
+            .scheme("bearer")
+            .bearerFormat("JWT")
         );
         return new OpenAPI()
-                .components(new Components())
-                .info(apiInfo())
-                .addSecurityItem(securityRequirement)
-                .components(components);
+            .components(new Components())
+            .info(apiInfo())
+            .addSecurityItem(securityRequirement)
+            .components(components);
     }
 
     private Info apiInfo() {
         return new Info()
-                .title("room-service") // API의 제목
-                .description("ROOM 관리 API") // API에 대한 설명
-                .version("1.0.0"); // API의 버전
+            .title("payment-service") // API의 제목
+            .description("결제 API") // API에 대한 설명
+            .version("1.0.0"); // API의 버전
     }
 }

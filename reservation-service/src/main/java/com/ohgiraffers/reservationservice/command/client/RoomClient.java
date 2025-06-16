@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 // 내부에서 room-service를 호출하는 상황
-@FeignClient(name = "room-service", configuration = FeignClientConfig.class)
+@FeignClient(name = "room-service", url = "http://localhost:8000/api/v1/room-service", configuration = FeignClientConfig.class)
 public interface RoomClient {
     // 내부에서 room-service를 호출하는 상황
     @GetMapping("/rooms/{id}")
     RoomDTO getRoomById(@PathVariable("id") Long id);
 
     // 내부에서 user-service를 호출하는 상황
-    @PostMapping("/rooms/list")
+    @PostMapping("/rooms/batch")
     List<RoomDTO> getRoomsByIds(@RequestBody RoomListRequest request);
 }
 
