@@ -1,6 +1,5 @@
 package com.unobnb.paymentservice.config;
 
-import com.unobnb.paymentservice.config.HeaderAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,17 +23,18 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session
-                        -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(HttpMethod.POST, "/**")
-                                .hasAuthority("CUSTOMER")
-                                .requestMatchers(HttpMethod.GET, "/**").hasAuthority("CUSTOMER")
-
-                                .anyRequest().authenticated()
-                )
-                .addFilterBefore(headerAuthenticationFilter(),
-                        UsernamePasswordAuthenticationFilter.class)
+            .sessionManagement(session
+                -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth ->
+                auth.requestMatchers(HttpMethod.POST, "/api/payment")
+                    .hasAuthority("CUSTOMER")
+                    .requestMatchers(HttpMethod.GET, "/api/payment").hasAuthority("CUSTOMER")
+                    .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**",
+                        "/swagger-resources/**").permitAll()
+                    .anyRequest().authenticated()
+            )
+            .addFilterBefore(headerAuthenticationFilter(),
+                UsernamePasswordAuthenticationFilter.class)
         ;
 
         return http.build();

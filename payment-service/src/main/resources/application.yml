@@ -1,5 +1,7 @@
 server:
   port: 8080
+  forward-headers-strategy: framework
+  
 
 #eureka:
 #  instance:
@@ -29,3 +31,7 @@ spring:
         format_sql: true
 
 
+springdoc:
+  packages-to-scan: com.unobnb.paymentservice
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
