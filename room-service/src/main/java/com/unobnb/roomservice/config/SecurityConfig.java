@@ -1,6 +1,8 @@
 package com.unobnb.roomservice.config;
 
 import com.unobnb.roomservice.security.HeaderAuthenticationFilter;
+import com.unobnb.roomservice.security.RestAccessDeniedHandler;
+import com.unobnb.roomservice.security.RestAuthenticationEntryPoint;
 import jakarta.ws.rs.HttpMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +20,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
+
+
     private final HeaderAuthenticationFilter headerAuthenticationFilter;
 
     @Bean
@@ -25,8 +31,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception ->
+                        exception
+                                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                                .accessDeniedHandler(restAccessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Swagger 문서 접근 허용
+
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -36,11 +46,11 @@ public class SecurityConfig {
                                 "/webjars/**"
                         ).permitAll()
 
-                        // ✅ 실제 서비스 API 보안 설정
-                        .requestMatchers(HttpMethod.GET, "/api/v1/room-service/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/room-service/**").hasAuthority("seller")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/room-service/**").hasAuthority("seller")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/room-service/**").hasAuthority("seller")
+
+                        .requestMatchers(HttpMethod.GET, "/rooms/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/rooms/**").hasAuthority("SELLER")
+                        .requestMatchers(HttpMethod.PUT, "/rooms/**").hasAuthority("SELLER")
+                        .requestMatchers(HttpMethod.DELETE, "/rooms/**").hasAuthority("SELLER")
 
                         .anyRequest().authenticated()
                 )
