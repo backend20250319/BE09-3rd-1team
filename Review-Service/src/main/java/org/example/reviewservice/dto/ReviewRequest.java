@@ -17,9 +17,7 @@ public class ReviewRequest {
     @Size(min = 10, max = 1000, message = "리뷰 내용은 10자 이상 1000자 이하여야 합니다.")
     private String content;
 
-    @NotNull(message = "사용자 ID는 필수입니다.")
-    @Positive(message = "사용자 ID는 양수여야 합니다.")
-    private Long userId;
+
 
     @NotBlank(message = "숙소 이름은 필수입니다.")
     @Size(max = 25, message = "숙소 이름은 25자 이하여야 합니다.")

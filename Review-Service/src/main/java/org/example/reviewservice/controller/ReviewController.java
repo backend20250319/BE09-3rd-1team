@@ -7,9 +7,9 @@ import org.example.reviewservice.dto.ReviewRequest;
 import org.example.reviewservice.dto.ReviewResponse;
 import org.example.reviewservice.service.ReviewService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-
 import java.util.List;
 
 @RestController
@@ -20,13 +20,16 @@ public class ReviewController {
     private final ReviewService service;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(@Valid @RequestBody ReviewRequest request) {
-        ReviewResponse response = service.createReview(request);
+    public ResponseEntity<ApiResponse<ReviewResponse>> createReview(
+            @Valid @RequestBody ReviewRequest request,
+            @AuthenticationPrincipal String userId
+    ) {
+        ReviewResponse response = service.createReview(request, Long.valueOf(userId));
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ReviewResponse>> getReview(@Valid @PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ReviewResponse>> getReview(@PathVariable Long id) {
         ReviewResponse response = service.getReview(id);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
@@ -36,20 +39,27 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponse.success(service.getAllReviews()));
     }
 
-
     @PutMapping("/{id}")
+
+    @PreAuthorize("hasAnyAuthority('CUSTOMER')")
     public ResponseEntity<ApiResponse<ReviewResponse>> updateReview(
             @PathVariable Long id,
-          @Valid  @RequestBody ReviewRequest request
+            @Valid @RequestBody ReviewRequest request,
+            @AuthenticationPrincipal String userId
     ) {
-        ReviewResponse response = service.updateReview(id, request);
+        ReviewResponse response = service.updateReview(id, request, Long.valueOf(userId));
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
-        service.deleteReview(id);
+
+    @PreAuthorize("hasAnyAuthority('CUSTOMER')")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long id,
+            @AuthenticationPrincipal String userId
+
+    ) {
+        service.deleteReview(id, Long.valueOf(userId));
         return ResponseEntity.noContent().build();
     }
 

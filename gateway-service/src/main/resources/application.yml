@@ -46,6 +46,7 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
+
   # --- 이 부분이 핵심 설정입니다 ---
 springdoc:
   swagger-ui:

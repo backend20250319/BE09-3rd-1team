@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.reviewservice.dto.ReviewRequest;
 import org.example.reviewservice.dto.ReviewResponse;
 import org.example.reviewservice.entity.ReviewEntity;
+import org.example.reviewservice.exceptionhandler.GlobalExceptionHandler;
 import org.example.reviewservice.repository.ReviewRepository;
+
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,11 +18,11 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
 
-    public ReviewResponse createReview(ReviewRequest request) {
+    public ReviewResponse createReview(ReviewRequest request, Long userId) {
         ReviewEntity review = ReviewEntity.builder()
                 .rate(request.getRate())
                 .content(request.getContent())
-                .userId(request.getUserId())
+                .userId(userId)
                 .room(request.getRoom())
                 .build();
 
@@ -30,7 +32,7 @@ public class ReviewService {
 
     public ReviewResponse getReview(Long id) {
         ReviewEntity review = reviewRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new GlobalExceptionHandler.ReviewNotFoundException("리뷰를 찾을 수 없습니다: " + id));
         return toResponse(review);
     }
 
@@ -41,23 +43,31 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public ReviewResponse updateReview(Long id, ReviewRequest request) {
+    public ReviewResponse updateReview(Long id, ReviewRequest request, Long callingUserId) {
         ReviewEntity review = reviewRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new GlobalExceptionHandler.ReviewNotFoundException("리뷰를 찾을 수 없습니다: " + id));
+
+        if (!review.getUserId().equals(callingUserId)) {
+            throw new GlobalExceptionHandler.UnauthorizedAccessException("리뷰를 수정할 권한이 없습니다.");
+        }
 
         review.setRate(request.getRate());
         review.setContent(request.getContent());
         review.setRoom(request.getRoom());
-        review.setUserId(request.getUserId());
+
 
         ReviewEntity updated = reviewRepository.save(review);
         return toResponse(updated);
     }
 
-    public void deleteReview(Long id) {
-       if (!reviewRepository.existsById(id)) {
-            throw new IllegalArgumentException("삭제할 리뷰를 찾을 수 없습니다: " + id);
+    public void deleteReview(Long id, Long callingUserId) {
+        ReviewEntity review = reviewRepository.findById(id)
+                .orElseThrow(() -> new GlobalExceptionHandler.ReviewNotFoundException("삭제할 리뷰를 찾을 수 없습니다: " + id));
+
+        if (!review.getUserId().equals(callingUserId)) {
+            throw new GlobalExceptionHandler.UnauthorizedAccessException("리뷰를 삭제할 권한이 없습니다.");
         }
+
         reviewRepository.deleteById(id);
     }
 
