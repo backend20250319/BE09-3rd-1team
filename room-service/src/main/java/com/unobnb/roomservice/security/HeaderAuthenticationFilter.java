@@ -23,7 +23,6 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         System.out.println("HeaderAuthenticationFilter doFilterInternal >>>>>> ");
 
-        // API Gateway가 전달한 헤더 읽기
         String authHeader = request.getHeader("Authorization");
         String userId = request.getHeader("X-User-Id");
         String role = request.getHeader("X-User-Role");
@@ -33,12 +32,17 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
         log.info("X-User-Role Header: {}", role);
 
         if (userId != null && role != null) {
-            // 이미 Gateway에서 검증된 정보로 인증 객체 구성
             PreAuthenticatedAuthenticationToken authentication =
-                    new PreAuthenticatedAuthenticationToken(userId, null,
-                            List.of(new SimpleGrantedAuthority(role)));
+                    new PreAuthenticatedAuthenticationToken(
+                            userId,
+                            null,
+                            List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+
+            log.info("Authorities: {}", authentication.getAuthorities());
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
         filterChain.doFilter(request, response);
     }
 }

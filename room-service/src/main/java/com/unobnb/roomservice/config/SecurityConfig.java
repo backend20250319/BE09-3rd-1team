@@ -3,7 +3,7 @@ package com.unobnb.roomservice.config;
 import com.unobnb.roomservice.security.HeaderAuthenticationFilter;
 import com.unobnb.roomservice.security.RestAccessDeniedHandler;
 import com.unobnb.roomservice.security.RestAuthenticationEntryPoint;
-import jakarta.ws.rs.HttpMethod;
+import org.springframework.http.HttpMethod;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +28,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -48,13 +50,16 @@ public class SecurityConfig {
 
 
                         .requestMatchers(HttpMethod.GET, "/rooms/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/rooms/**").hasAuthority("SELLER")
-                        .requestMatchers(HttpMethod.PUT, "/rooms/**").hasAuthority("SELLER")
-                        .requestMatchers(HttpMethod.DELETE, "/rooms/**").hasAuthority("SELLER")
+                        .requestMatchers(HttpMethod.POST, "/rooms/**").hasRole("SELLER")
+                        .requestMatchers(HttpMethod.PUT, "/rooms/**").hasRole("SELLER")
+                        .requestMatchers(HttpMethod.DELETE, "/rooms/**").hasRole("SELLER")
 
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(headerAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+
+
 
         return http.build();
     }
