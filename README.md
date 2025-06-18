@@ -83,22 +83,22 @@ JWT 기반의 사용자 인증 및 권한 분기 처리
 1. **Gateway Service**
 - 클라이언트와 각 마이크로서비스 간의 진입 지점 역할
 - 요청 라우팅, 필터링, 인증 토큰 전달 등을 담당
-1. **User Service**
+2. **User Service**
 - 회원가입, 로그인, 사용자 정보 조회 등의 사용자 관련 기능 처리
 - JWT 토큰 발급 및 검증 기능 포함
-1. **Room Service**
+3. **Room Service**
 - 숙박 시설 등록, 수정, 삭제, 조회 기능 제공
 - 관리자 권한 기반 CRUD 제한 적용
-1. **Reservation Service**
+4. **Reservation Service**
 - 사용자의 예약 생성, 조회, 취소 기능 제공
 - 방 정보와 사용자 정보 연동
-1. **Review Service**
+5. **Review Service**
 - 사용자 후기 등록, 수정, 삭제, 조회 기능 제공
 - 방 ID 및 사용자 ID를 기반으로 연결
-1. **Payment Service**
+6. **Payment Service**
 - 예약에 대한 결제 요청, 결제 완료, 환불 처리 기능 제공
 - 외부 결제 API 연동을 고려한 구조
-1. **Eureka Server**
+7. **Eureka Server**
 - 각 마이크로서비스의 위치를 관리하는 서비스 Discovery Server
 - Service 간의 동적 등록 및 탐색 지원
 
