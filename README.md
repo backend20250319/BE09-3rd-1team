@@ -122,6 +122,12 @@ JWT 기반의 사용자 인증 및 권한 분기 처리
 
 <br>
 
+# ✅ 이벤트 스토밍
+https://miro.com/app/board/uXjVIposZhE=/
+
+<br>
+
+
 # ✅ 요구사항 정의서
 ---
 ## 담당 기능
